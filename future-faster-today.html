@@ -108,10 +108,35 @@
     background: var(--surface2); flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; color: var(--accent); font-weight: 700;
-    overflow: hidden;
+    overflow: hidden; position: relative; cursor: pointer;
   }
   .person-photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-  .person-photo { position: relative; }
+
+  /* ── Photo lightbox ── */
+  .lightbox {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox-img {
+    max-width: 100%; max-height: 80vh; border-radius: 16px;
+    object-fit: contain; box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .lightbox-name {
+    position: absolute; bottom: 48px; left: 0; right: 0;
+    text-align: center; font-size: 15px; font-weight: 700; color: var(--text);
+  }
+  .lightbox-close {
+    position: absolute; top: env(safe-area-inset-top, 16px); right: 16px;
+    margin-top: 12px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: none;
+    color: var(--text); font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
   .person-details { flex: 1; min-width: 0; }
   .person-role { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 2px; }
   .person-company { font-size: 12px; color: var(--text-secondary); margin-bottom: 1px; }
@@ -183,9 +208,24 @@
   }
   .search-bar::placeholder { color: var(--text-secondary); }
   .search-bar:focus { border-color: var(--accent); }
+
+  /* ── Person links in schedule ── */
+  .person-link {
+    color: var(--accent); text-decoration: underline;
+    text-decoration-color: rgba(0,224,160,0.3);
+    text-underline-offset: 2px; cursor: pointer;
+    font-weight: 600;
+  }
+  .person-link:active { opacity: 0.7; }
 </style>
 </head>
 <body>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img class="lightbox-img" id="lightbox-img" src="" alt="">
+  <div class="lightbox-name" id="lightbox-name"></div>
+</div>
 
 <div class="header">
   <div class="header-title">Future Faster Today</div>
@@ -204,7 +244,7 @@
 
     <div id="people-list">
 
-      <div class="person-card" data-search="christine gould thought for food giga founder ceo food">
+      <div class="person-card" data-person="christine gould" data-search="christine gould thought for food giga founder ceo food">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Christine Gould</div>
@@ -214,17 +254,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/gouldChristine.png" onerror="this.remove();" alt="CG">CG</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/gouldChristine.png" onerror="this.remove();" alt="CG">CG</div>
             <div class="person-details">
               <div class="person-role">Founder &amp; CEO</div>
               <div class="person-company">Thought for Food / GIGA</div>
-              <div class="person-bio">Session: Food fight? Better collaboration for food startups and corporates</div>
+              <div class="person-bio">Founded Thought For Food in 2011, building it into the largest innovation community in food and agriculture, with 30,000 next-gen talents across 180+ countries. Appointed by the UN Deputy Secretary-General to the Advisory Committee for the Food Systems Summit; Forbes named her one of the top 10 women in synthetic biology. Holds an MPA from Columbia, authored "The Change-makers Guide to Feeding the Planet," and now also leads GIGA for nutrition and climate resilience.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="fran antequera agritech center mision andalucia atg synbio spain founder agriculture">
+      <div class="person-card" data-person="fran antequera" data-search="fran antequera agritech center mision andalucia atg synbio spain founder agriculture">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Fran Antequera</div>
@@ -234,17 +274,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/antequeraFran.png" onerror="this.remove();" alt="FA">FA</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/antequeraFran.png" onerror="this.remove();" alt="FA">FA</div>
             <div class="person-details">
               <div class="person-role">Founder</div>
               <div class="person-company">AgriTech Center at Misi&oacute;n Andaluc&iacute;a / ATG SynBio Spain</div>
-              <div class="person-bio">Session: Beyond regeneration - Designing future soil systems</div>
+              <div class="person-bio">Biochemist and founding president of ATG SynBio Spain, connecting academia, startups, and investors across Spain's synthetic biology ecosystem. Directs the Centro Misi&oacute;n Agrotech in Almer&iacute;a, one of Andaluc&iacute;a's digital entrepreneurship hubs for agrifood innovation. ValleyDAO called him one of the leading young voices of SynBio in Spain.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="livia kalossaka creative destruction lab agriculture">
+      <div class="person-card" data-person="livia kalossaka" data-search="livia kalossaka creative destruction lab agriculture">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Livia Kalossaka</div>
@@ -254,17 +294,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/kalossakaLivia.png" onerror="this.remove();" alt="LK">LK</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/kalossakaLivia.png" onerror="this.remove();" alt="LK">LK</div>
             <div class="person-details">
               <div class="person-role">Speaker</div>
               <div class="person-company">Creative Destruction Lab</div>
-              <div class="person-bio">Session: Beyond regeneration - Designing future soil systems</div>
+              <div class="person-bio">Head of Deep Tech Strategy &amp; Foresight at Creative Destruction Lab Paris, helping commercialize breakthrough science. Holds a PhD from Imperial College London in 3D printing and biomaterials; the European Commission named her Young Energy Champion for advancing clean energy. Vice-President of YES-Europe, a network of 6,000 young leaders in energy and sustainability across 18 countries.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="nuria albo canals ministerio transportes movilidad sostenible ai engineer mobility">
+      <div class="person-card" data-person="nuria albo canals" data-search="nuria albo canals ministerio transportes movilidad sostenible ai engineer mobility">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">N&uacute;ria Alb&oacute; Canals</div>
@@ -274,17 +314,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/alboNuria.png" onerror="this.remove();" alt="NA">NA</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/alboNuria.png" onerror="this.remove();" alt="NA">NA</div>
             <div class="person-details">
               <div class="person-role">AI Engineer, Project Manager</div>
               <div class="person-company">Ministerio de Transportes y Movilidad Sostenible</div>
-              <div class="person-bio">Session: AI and Sustainable Mobility</div>
+              <div class="person-bio">AI Engineer and Project Manager at INECO, the public engineering consultancy under Spain's Ministry of Transport and Sustainable Mobility. Works at the intersection of AI, data infrastructure, and public mobility systems, advancing the idea that AI is critical infrastructure on par with energy and transport. Academic roots from the Universitat de Barcelona and EAE Business School.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="natalia olsen catavalley eu innovation ecosystem">
+      <div class="person-card" data-person="natalia olsen" data-search="natalia olsen catavalley eu innovation ecosystem">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Natalia Olsen</div>
@@ -294,37 +334,37 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/olsenNatalia.png" onerror="this.remove();" alt="NO">NO</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/olsenNatalia.png" onerror="this.remove();" alt="NO">NO</div>
             <div class="person-details">
               <div class="person-role">Speaker</div>
               <div class="person-company">CataValley</div>
-              <div class="person-bio">Session: Building an EU-first innovation ecosystem</div>
+              <div class="person-bio">Co-founder of CataValley. Details coming soon.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="carolina angelini barcelona partners ceo eu innovation">
+      <div class="person-card" data-person="carolina angelini" data-search="carolina angelini barcelona partners ceo eu innovation">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Carolina Angelini</div>
-            <div class="person-role-preview">CEO, Barcelona and Partners</div>
+            <div class="person-role-preview">Head of Investment Promotion, Barcelona &amp; Partners</div>
           </div>
           <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/angeliniCarolina.png" onerror="this.remove();" alt="CA">CA</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/angeliniCarolina.png" onerror="this.remove();" alt="CA">CA</div>
             <div class="person-details">
-              <div class="person-role">CEO</div>
-              <div class="person-company">Barcelona and Partners</div>
-              <div class="person-bio">Session: Building an EU-first innovation ecosystem</div>
+              <div class="person-role">Head of Investment Promotion</div>
+              <div class="person-company">Barcelona &amp; Partners</div>
+              <div class="person-bio">Heads investment promotion and strategic partnerships at Barcelona &amp; Partners, the investment agency of Barcelona Global that attracts innovative companies to the city. She brings over 20 years of experience across startups, corporates, and SMEs with deep knowledge of Barcelona's tech ecosystem. A regular speaker at events like IoT Solutions World Congress on startup investment and ecosystem building.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="luca cominassi metagov oecd ai law policy expert eu">
+      <div class="person-card" data-person="luca cominassi" data-search="luca cominassi metagov oecd ai law policy expert eu">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Luca Cominassi</div>
@@ -334,17 +374,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/cominassiLuca.png" onerror="this.remove();" alt="LC">LC</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/cominassiLuca.png" onerror="this.remove();" alt="LC">LC</div>
             <div class="person-details">
               <div class="person-role">AI Law &amp; Policy Expert</div>
               <div class="person-company">Metagov / OECD</div>
-              <div class="person-bio">Session: Building an EU-first innovation ecosystem</div>
+              <div class="person-bio">Italian attorney specializing in emerging technology law, currently a Public AI Fellow at Metagov with work published on the OECD AI platform. He co-authored policy analysis on Italy's AI law alongside experts from Oxford, Hugging Face, and the Barcelona Supercomputing Center. He advocates for fully open-source AI models and public AI infrastructure as a foundation for democratic governance.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="de kai hong kong university science technology professor computer science ai pioneer">
+      <div class="person-card" data-person="de kai" data-search="de kai hong kong university science technology professor computer science ai pioneer">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">De Kai</div>
@@ -354,17 +394,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/deKai.png" onerror="this.remove();" alt="DK">DK</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/deKai.png" onerror="this.remove();" alt="DK">DK</div>
             <div class="person-details">
               <div class="person-role">Professor of Computer Science &amp; Engineering, AI Pioneer</div>
               <div class="person-company">Hong Kong University of Science and Technology</div>
-              <div class="person-bio">Session: AI's Next Move. Author of "Raising AI".</div>
+              <div class="person-bio">Pioneering AI professor at HKUST who invented the web's first online language translator, which spawned Google Translate, Yahoo Translate, and Bing Translator. Named a Founding Fellow of the Association for Computational Linguistics (one of only 17 worldwide), he was also among the inaugural members of Google's AI ethics council. His book "Raising AI," published by MIT Press, reframes AI not as gods or tools but as attention-seeking children we're collectively raising.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="robb miller fractional chief revenue officer selling ai saas">
+      <div class="person-card" data-person="robb miller" data-search="robb miller fractional chief revenue officer selling ai saas">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Robb Miller</div>
@@ -374,17 +414,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/millerRobb.png" onerror="this.remove();" alt="RM">RM</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/millerRobb.png" onerror="this.remove();" alt="RM">RM</div>
             <div class="person-details">
               <div class="person-role">Chief Revenue Officer</div>
               <div class="person-company">Fractional</div>
-              <div class="person-bio">Session: Selling AI SaaS - from Software as a Service to Services as a Software</div>
+              <div class="person-bio">Veteran SaaS sales leader with 30+ years driving revenue at tech scale-ups including Livefyre (acquired by Adobe), Stackla, RichRelevance, and Issuu. As a Fractional CRO and VP of Sales at Sales Force Europe, he helps startups build and scale global sales organizations. He holds a BS in Business Administration from UC Berkeley.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="carlos grau grau innovation selling ai saas">
+      <div class="person-card" data-person="carlos grau" data-search="carlos grau grau innovation selling ai saas">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Carlos Grau</div>
@@ -394,17 +434,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/grauCarlos.png" onerror="this.remove();" alt="CG">CG</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/grauCarlos.png" onerror="this.remove();" alt="CG">CG</div>
             <div class="person-details">
               <div class="person-role">Speaker</div>
               <div class="person-company">Grau Innovation</div>
-              <div class="person-bio">Session: Selling AI SaaS - from Software as a Service to Services as a Software</div>
+              <div class="person-bio">Former CEO of Mobile World Capital Barcelona, where he led the foundation's mission to drive digital transformation across industry, talent, and society. Before that, he was CEO of Microsoft Catalonia, where he tripled turnover in four years, and held senior roles at Hewlett-Packard, Accenture, Sun Microsystems, and Telef&oacute;nica. He's also an entrepreneur, having founded Biid (mobile identity) and Step One Ventures.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="jen stein aerospace corporation senior foresight strategist sustainability space">
+      <div class="person-card" data-person="jen stein" data-search="jen stein aerospace corporation senior foresight strategist sustainability space">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Jen Stein, PhD</div>
@@ -414,17 +454,17 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/steinJen.png" onerror="this.remove();" alt="JS">JS</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/steinJen.png" onerror="this.remove();" alt="JS">JS</div>
             <div class="person-details">
               <div class="person-role">Senior Foresight Strategist (Project Engineer)</div>
               <div class="person-company">The Aerospace Corporation</div>
-              <div class="person-bio">Session: How to shoot for the moon - and save the Earth</div>
+              <div class="person-bio">Senior Foresight Strategist and Project Engineer at The Aerospace Corporation's Center for Space Policy and Strategy, where she develops possible and preferable futures using foresight and speculative design. Her research spans human-computer interaction, world building, interactive architecture, and cybernetic systems. Affiliated with USC, she brings a cross-disciplinary lens connecting space policy with creative futures practice.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="victor luo eth zurich director space technology partnerships sustainability">
+      <div class="person-card" data-person="victor luo" data-search="victor luo eth zurich director space technology partnerships sustainability">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
             <div class="person-name">Victor Luo</div>
@@ -434,11 +474,11 @@
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/luoVictor.png" onerror="this.remove();" alt="VL">VL</div>
+            <div class="person-photo" onclick="openLightbox(this)"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/luoVictor.png" onerror="this.remove();" alt="VL">VL</div>
             <div class="person-details">
               <div class="person-role">Director, Space Technology &amp; Partnerships</div>
               <div class="person-company">ETH Z&uuml;rich</div>
-              <div class="person-bio">Session: How to shoot for the moon - and save the Earth</div>
+              <div class="person-bio">Leads space technology partnerships and entrepreneurship at ETH Z&uuml;rich Space, where he's incubating deep-tech space concepts and securing seed funding for orbital experiments. Previously at NASA's Jet Propulsion Laboratory, he led the team that built the first HoloLens application for Mars rover operations, winning the 2018 NASA Software of the Year Award. He's also worked at Amazon, Google X, and Toyota Research Institute.</div>
             </div>
           </div>
         </div>
@@ -463,7 +503,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">FAST</div>
-        <div class="sched-lead">Lead: <strong>Christine Gould</strong> (Thought for Food / GIGA)</div>
+        <div class="sched-lead">Lead: <a class="person-link" onclick="goToPerson('christine gould',event)">Christine Gould</a> (Thought for Food / GIGA)</div>
         <div class="sched-desc">Corporate innovation goals often align with &mdash; and depend on &mdash; agile startups paving the way. But timelines, scope, and scale are often out of whack, especially in massive, complex industries like food and agriculture. Learn how companies, investors, startups, and governments can collaborate to take proven solutions and get them adopted &mdash; at speed and at system level.</div>
       </div></div>
     </div>
@@ -479,7 +519,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">FAST</div>
-        <div class="sched-lead">Leads: <strong>Fran Antequera</strong> (AgriTech Center) &amp; <strong>Livia Kalossaka</strong> (CDL)</div>
+        <div class="sched-lead">Leads: <a class="person-link" onclick="goToPerson('fran antequera',event)">Fran Antequera</a> (AgriTech Center) &amp; <a class="person-link" onclick="goToPerson('livia kalossaka',event)">Livia Kalossaka</a> (CDL)</div>
         <div class="sched-desc">Regenerative agriculture set the direction, but what comes next? This session pushes beyond current frameworks to explore how we might actively design soil ecosystems for resilience, governance, and territorial stability &mdash; repositioning soil as living, programmable, and strategic infrastructure for a climate-constrained future.</div>
       </div></div>
     </div>
@@ -495,7 +535,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">FAST</div>
-        <div class="sched-lead">Lead: <strong>N&uacute;ria Alb&oacute; Canals</strong> (Min. de Transportes y Movilidad Sostenible)</div>
+        <div class="sched-lead">Lead: <a class="person-link" onclick="goToPerson('nuria albo canals',event)">N&uacute;ria Alb&oacute; Canals</a> (Min. de Transportes y Movilidad Sostenible)</div>
         <div class="sched-desc">How will AI, autonomous vehicles, and quantum computing change urban and global logistics? AI engineer and data scientist N&uacute;ria Alb&oacute; will talk about the Spanish Ministry of Digital Transformation's AI initiatives in mobility and sustainability.</div>
       </div></div>
     </div>
@@ -511,7 +551,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">FAST</div>
-        <div class="sched-lead">Leads: <strong>Natalia Olsen</strong> (CataValley), <strong>Carolina Angelini</strong> (Barcelona &amp; Partners), <strong>Luca Cominassi</strong> (Metagov/OECD)</div>
+        <div class="sched-lead">Leads: <a class="person-link" onclick="goToPerson('natalia olsen',event)">Natalia Olsen</a> (CataValley), <a class="person-link" onclick="goToPerson('carolina angelini',event)">Carolina Angelini</a> (Barcelona &amp; Partners), <a class="person-link" onclick="goToPerson('luca cominassi',event)">Luca Cominassi</a> (Metagov/OECD)</div>
         <div class="sched-desc">Geopolitics are shifting faster, and in more unexpected ways, than even seasoned strategists expected. In this age of uncertainty, European states, cities, innovation clusters, investors, and startups are all rethinking their futures &mdash; and finding common cause together.</div>
       </div></div>
     </div>
@@ -527,7 +567,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">FAST</div>
-        <div class="sched-lead">Lead: <strong>De Kai</strong> (HKUST)</div>
+        <div class="sched-lead">Lead: <a class="person-link" onclick="goToPerson('de kai',event)">De Kai</a> (HKUST)</div>
         <div class="sched-desc">We think of AI as a superintelligence, but what if it's more like a child &mdash; that needs to be raised (by us!) to learn hygiene, manners, kindness alongside knowledge. Discuss with noted professor and AI developer De Kai, author of "Raising AI".</div>
       </div></div>
     </div>
@@ -543,7 +583,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">Facilitator-Led</div>
-        <div class="sched-lead">Leads: <strong>Robb Miller</strong> (Fractional) &amp; <strong>Carlos Grau</strong> (Grau Innovation)</div>
+        <div class="sched-lead">Leads: <a class="person-link" onclick="goToPerson('robb miller',event)">Robb Miller</a> (Fractional) &amp; <a class="person-link" onclick="goToPerson('carlos grau',event)">Carlos Grau</a> (Grau Innovation)</div>
         <div class="sched-desc">AI adoption is a scramble, but it's quickly entering enterprise offerings, which will shift how it's sold. Robb Miller, a global SaaS sales thought leader, will talk about cross-border lessons on pipeline generation, consumption pricing, and trading margin for moat. In conversation with Carlos Grau, they will discuss "Service as a Software" &mdash; a new kind of SaaS disrupting professional services.</div>
       </div></div>
     </div>
@@ -559,7 +599,7 @@
       </div>
       <div class="sched-body"><div class="sched-body-inner">
         <div class="sched-tag">Facilitator-Led</div>
-        <div class="sched-lead">Leads: <strong>Jen Stein, PhD</strong> (Aerospace Corp.) &amp; <strong>Victor Luo</strong> (ETH Z&uuml;rich)</div>
+        <div class="sched-lead">Leads: <a class="person-link" onclick="goToPerson('jen stein',event)">Jen Stein, PhD</a> (Aerospace Corp.) &amp; <a class="person-link" onclick="goToPerson('victor luo',event)">Victor Luo</a> (ETH Z&uuml;rich)</div>
         <div class="sched-desc">Building on her Stanford d.school class with the participation of the SETI Institute, Blue Origin, and Google X, Miki Sode will guide participants through how space innovation and systems thinking can unlock bold solutions here on the ground. From lunar missions to regenerative design &mdash; this talk is about aiming high, with both feet planted in planetary purpose.</div>
       </div></div>
     </div>
@@ -620,6 +660,48 @@
 
   function togglePerson(header) { toggleAccordion(header, '.person-card'); }
   function toggleSched(header) { toggleAccordion(header, '.sched-item'); }
+
+  // ── Go to person from schedule ──
+  function goToPerson(personKey, e) {
+    e.stopPropagation();
+    // Switch to People tab
+    tabs.forEach(t => t.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-panel="people"]').classList.add('active');
+    document.getElementById('people').classList.add('active');
+
+    // Find the person card
+    const card = document.querySelector('[data-person="' + personKey + '"]');
+    if (!card) return;
+
+    // Close any open person cards
+    document.querySelectorAll('.person-card.open').forEach(c => {
+      c.classList.remove('open');
+      c.querySelector('.person-body').style.maxHeight = '0';
+    });
+
+    // Open this card
+    card.classList.add('open');
+    const body = card.querySelector('.person-body');
+    body.style.maxHeight = body.scrollHeight + 'px';
+
+    // Scroll to it
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+
+  // ── Photo lightbox ──
+  function openLightbox(el) {
+    event.stopPropagation();
+    const img = el.querySelector('img');
+    if (!img) return; // no image loaded, just initials
+    const name = el.closest('.person-card').querySelector('.person-name').textContent;
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox-name').textContent = name;
+    document.getElementById('lightbox').classList.add('active');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+  }
 
   // ── Search: People ──
   document.getElementById('people-search').addEventListener('input', function() {
