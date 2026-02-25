@@ -72,10 +72,35 @@
   }
   .section-label:first-child { margin-top: 0; }
 
-  /* ── People cards ── */
+  /* ── People cards (accordion) ── */
   .person-card {
     background: var(--surface); border-radius: 14px;
-    padding: 16px; margin-bottom: 12px;
+    margin-bottom: 8px; overflow: hidden;
+  }
+  .person-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; cursor: pointer;
+    -webkit-user-select: none; user-select: none;
+  }
+  .person-header-left {
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  .person-name { font-size: 15px; font-weight: 700; }
+  .person-role-preview { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+  .person-chevron {
+    width: 20px; height: 20px; flex-shrink: 0;
+    transition: transform 0.25s ease;
+    color: var(--text-secondary);
+  }
+  .person-card.open .person-chevron { transform: rotate(180deg); }
+  .person-card.open .person-name { color: var(--accent); }
+
+  .person-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .person-body-inner {
+    padding: 0 16px 16px;
     display: flex; gap: 14px; align-items: flex-start;
   }
   .person-photo {
@@ -86,8 +111,7 @@
     overflow: hidden;
   }
   .person-photo img { width: 100%; height: 100%; object-fit: cover; }
-  .person-info { flex: 1; min-width: 0; }
-  .person-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .person-details { flex: 1; min-width: 0; }
   .person-role { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 2px; }
   .person-company { font-size: 12px; color: var(--text-secondary); margin-bottom: 1px; }
   .person-country { font-size: 11px; color: var(--text-secondary); }
@@ -179,57 +203,107 @@
     <div id="people-list">
 
       <div class="person-card" data-search="alex rivera united states creative director luminar studios">
-        <div class="person-photo">AR</div>
-        <div class="person-info">
-          <div class="person-name">Alex Rivera</div>
-          <div class="person-role">Creative Director</div>
-          <div class="person-company">Luminar Studios</div>
-          <div class="person-country">🇺🇸 United States</div>
-          <div class="person-bio">Award-winning creative director with 12 years of experience in immersive storytelling and experiential design. Leads the visual identity for FFT.</div>
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Alex Rivera</div>
+            <div class="person-role-preview">Creative Director</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo">AR</div>
+            <div class="person-details">
+              <div class="person-role">Creative Director</div>
+              <div class="person-company">Luminar Studios</div>
+              <div class="person-country">🇺🇸 United States</div>
+              <div class="person-bio">Award-winning creative director with 12 years of experience in immersive storytelling and experiential design. Leads the visual identity for FFT.</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="person-card" data-search="priya menon india lead engineer nexaflow">
-        <div class="person-photo">PM</div>
-        <div class="person-info">
-          <div class="person-name">Priya Menon</div>
-          <div class="person-role">Lead Engineer</div>
-          <div class="person-company">NexaFlow</div>
-          <div class="person-country">🇮🇳 India</div>
-          <div class="person-bio">Full-stack engineer specializing in real-time systems and low-latency event tech. Architected the FFT scheduling platform.</div>
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Priya Menon</div>
+            <div class="person-role-preview">Lead Engineer</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo">PM</div>
+            <div class="person-details">
+              <div class="person-role">Lead Engineer</div>
+              <div class="person-company">NexaFlow</div>
+              <div class="person-country">🇮🇳 India</div>
+              <div class="person-bio">Full-stack engineer specializing in real-time systems and low-latency event tech. Architected the FFT scheduling platform.</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="person-card" data-search="jonas eriksson sweden production manager nordic events co">
-        <div class="person-photo">JE</div>
-        <div class="person-info">
-          <div class="person-name">Jonas Eriksson</div>
-          <div class="person-role">Production Manager</div>
-          <div class="person-company">Nordic Events Co.</div>
-          <div class="person-country">🇸🇪 Sweden</div>
-          <div class="person-bio">Manages end-to-end production logistics. Has coordinated 50+ large-scale international events across Europe and the Americas.</div>
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Jonas Eriksson</div>
+            <div class="person-role-preview">Production Manager</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo">JE</div>
+            <div class="person-details">
+              <div class="person-role">Production Manager</div>
+              <div class="person-company">Nordic Events Co.</div>
+              <div class="person-country">🇸🇪 Sweden</div>
+              <div class="person-bio">Manages end-to-end production logistics. Has coordinated 50+ large-scale international events across Europe and the Americas.</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="person-card" data-search="maya okafor nigeria community lead brightpath collective">
-        <div class="person-photo">MO</div>
-        <div class="person-info">
-          <div class="person-name">Maya Okafor</div>
-          <div class="person-role">Community Lead</div>
-          <div class="person-company">BrightPath Collective</div>
-          <div class="person-country">🇳🇬 Nigeria</div>
-          <div class="person-bio">Community strategist connecting grassroots movements with global tech events. Runs attendee engagement and networking sessions at FFT.</div>
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Maya Okafor</div>
+            <div class="person-role-preview">Community Lead</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo">MO</div>
+            <div class="person-details">
+              <div class="person-role">Community Lead</div>
+              <div class="person-company">BrightPath Collective</div>
+              <div class="person-country">🇳🇬 Nigeria</div>
+              <div class="person-bio">Community strategist connecting grassroots movements with global tech events. Runs attendee engagement and networking sessions at FFT.</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="person-card" data-search="lucas chen canada av technician soundstage pro">
-        <div class="person-photo">LC</div>
-        <div class="person-info">
-          <div class="person-name">Lucas Chen</div>
-          <div class="person-role">AV Technician</div>
-          <div class="person-company">SoundStage Pro</div>
-          <div class="person-country">🇨🇦 Canada</div>
-          <div class="person-bio">Audio-visual specialist handling all stage tech, streaming infrastructure, and live production for both days of the event.</div>
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Lucas Chen</div>
+            <div class="person-role-preview">AV Technician</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo">LC</div>
+            <div class="person-details">
+              <div class="person-role">AV Technician</div>
+              <div class="person-company">SoundStage Pro</div>
+              <div class="person-country">🇨🇦 Canada</div>
+              <div class="person-bio">Audio-visual specialist handling all stage tech, streaming infrastructure, and live production for both days of the event.</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -424,9 +498,33 @@
     });
   });
 
+  // ── People accordion (one open at a time) ──
+  function togglePerson(header) {
+    const card = header.closest('.person-card');
+    const body = card.querySelector('.person-body');
+    const isOpen = card.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.person-card.open').forEach(c => {
+      c.classList.remove('open');
+      c.querySelector('.person-body').style.maxHeight = '0';
+    });
+
+    // Open clicked (if it wasn't already open)
+    if (!isOpen) {
+      card.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  }
+
   // ── Search: People ──
   document.getElementById('people-search').addEventListener('input', function() {
     const q = this.value.toLowerCase();
+    // Close any open card when searching
+    document.querySelectorAll('.person-card.open').forEach(c => {
+      c.classList.remove('open');
+      c.querySelector('.person-body').style.maxHeight = '0';
+    });
     document.querySelectorAll('.person-card').forEach(card => {
       const match = card.getAttribute('data-search').includes(q);
       card.style.display = match ? '' : 'none';
