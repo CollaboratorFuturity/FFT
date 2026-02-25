@@ -110,7 +110,8 @@
     font-size: 20px; color: var(--accent); font-weight: 700;
     overflow: hidden;
   }
-  .person-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .person-photo img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+  .person-photo { position: relative; }
   .person-details { flex: 1; min-width: 0; }
   .person-role { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 2px; }
   .person-company { font-size: 12px; color: var(--text-secondary); margin-bottom: 1px; }
@@ -130,39 +131,47 @@
   .day-header span { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
 
   .sched-item {
-    display: flex; gap: 12px; padding: 12px 0;
     border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .sched-header {
+    display: flex; gap: 12px; padding: 12px 0;
+    cursor: pointer; -webkit-user-select: none; user-select: none;
   }
   .sched-time {
-    width: 58px; flex-shrink: 0;
+    width: 50px; flex-shrink: 0;
     font-size: 13px; font-weight: 700; color: var(--accent);
     padding-top: 1px;
   }
-  .sched-details { flex: 1; }
-  .sched-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .sched-summary { flex: 1; min-width: 0; }
+  .sched-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; transition: color 0.2s; }
   .sched-meta { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
   .sched-meta strong { color: var(--text); font-weight: 600; }
-
-  /* ── Session cards ── */
-  .session-card {
-    background: var(--surface); border-radius: 14px;
-    padding: 16px; margin-bottom: 12px;
-    border-left: 3px solid var(--accent);
+  .sched-chevron {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px;
+    transition: transform 0.25s ease; color: var(--text-secondary);
   }
-  .session-tag {
+  .sched-item.open .sched-chevron { transform: rotate(180deg); }
+  .sched-item.open .sched-title { color: var(--accent); }
+
+  .sched-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .sched-body-inner {
+    padding: 0 0 14px 62px;
+  }
+  .sched-tag {
     display: inline-block; font-size: 10px; font-weight: 700;
     letter-spacing: 1.2px; text-transform: uppercase;
     background: var(--accent-dim); color: var(--accent);
     padding: 3px 8px; border-radius: 6px; margin-bottom: 8px;
   }
-  .session-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-  .session-time { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
-  .session-location { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-  .session-lead { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
-  .session-lead strong { color: var(--text); }
-  .session-desc {
+  .sched-lead { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+  .sched-lead strong { color: var(--text); }
+  .sched-desc {
     font-size: 13px; color: var(--text-secondary); line-height: 1.6;
-    padding-top: 10px; border-top: 1px solid var(--border);
+    padding-top: 8px; border-top: 1px solid var(--border);
   }
 
   /* ── Search / filter ── */
@@ -174,12 +183,6 @@
   }
   .search-bar::placeholder { color: var(--text-secondary); }
   .search-bar:focus { border-color: var(--accent); }
-
-  /* ── Empty state ── */
-  .empty-note {
-    text-align: center; color: var(--text-secondary); font-size: 13px;
-    padding: 40px 20px; line-height: 1.6;
-  }
 </style>
 </head>
 <body>
@@ -190,7 +193,6 @@
   <div class="tabs">
     <button class="tab active" data-panel="people">People</button>
     <button class="tab" data-panel="schedule">Schedule</button>
-    <button class="tab" data-panel="sessions">Sessions</button>
   </div>
 </div>
 
@@ -202,106 +204,241 @@
 
     <div id="people-list">
 
-      <div class="person-card" data-search="alex rivera united states creative director luminar studios">
+      <div class="person-card" data-search="christine gould thought for food giga founder ceo food">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
-            <div class="person-name">Alex Rivera</div>
-            <div class="person-role-preview">Creative Director</div>
+            <div class="person-name">Christine Gould</div>
+            <div class="person-role-preview">Founder &amp; CEO, Thought for Food / GIGA</div>
           </div>
           <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo">AR</div>
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/gouldChristine.png" onerror="this.remove();" alt="CG">CG</div>
             <div class="person-details">
-              <div class="person-role">Creative Director</div>
-              <div class="person-company">Luminar Studios</div>
-              <div class="person-country">🇺🇸 United States</div>
-              <div class="person-bio">Award-winning creative director with 12 years of experience in immersive storytelling and experiential design. Leads the visual identity for FFT.</div>
+              <div class="person-role">Founder &amp; CEO</div>
+              <div class="person-company">Thought for Food / GIGA</div>
+              <div class="person-bio">Session: Food fight? Better collaboration for food startups and corporates</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="priya menon india lead engineer nexaflow">
+      <div class="person-card" data-search="fran antequera agritech center mision andalucia atg synbio spain founder agriculture">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
-            <div class="person-name">Priya Menon</div>
-            <div class="person-role-preview">Lead Engineer</div>
+            <div class="person-name">Fran Antequera</div>
+            <div class="person-role-preview">Founder, AgriTech Center / ATG SynBio Spain</div>
           </div>
           <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo">PM</div>
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/antequeraFran.png" onerror="this.remove();" alt="FA">FA</div>
             <div class="person-details">
-              <div class="person-role">Lead Engineer</div>
-              <div class="person-company">NexaFlow</div>
-              <div class="person-country">🇮🇳 India</div>
-              <div class="person-bio">Full-stack engineer specializing in real-time systems and low-latency event tech. Architected the FFT scheduling platform.</div>
+              <div class="person-role">Founder</div>
+              <div class="person-company">AgriTech Center at Misi&oacute;n Andaluc&iacute;a / ATG SynBio Spain</div>
+              <div class="person-bio">Session: Beyond regeneration - Designing future soil systems</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="jonas eriksson sweden production manager nordic events co">
+      <div class="person-card" data-search="livia kalossaka creative destruction lab agriculture">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
-            <div class="person-name">Jonas Eriksson</div>
-            <div class="person-role-preview">Production Manager</div>
+            <div class="person-name">Livia Kalossaka</div>
+            <div class="person-role-preview">Creative Destruction Lab</div>
           </div>
           <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo">JE</div>
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/kalossakaLivia.png" onerror="this.remove();" alt="LK">LK</div>
             <div class="person-details">
-              <div class="person-role">Production Manager</div>
-              <div class="person-company">Nordic Events Co.</div>
-              <div class="person-country">🇸🇪 Sweden</div>
-              <div class="person-bio">Manages end-to-end production logistics. Has coordinated 50+ large-scale international events across Europe and the Americas.</div>
+              <div class="person-role">Speaker</div>
+              <div class="person-company">Creative Destruction Lab</div>
+              <div class="person-bio">Session: Beyond regeneration - Designing future soil systems</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="maya okafor nigeria community lead brightpath collective">
+      <div class="person-card" data-search="nuria albo canals ministerio transportes movilidad sostenible ai engineer mobility">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
-            <div class="person-name">Maya Okafor</div>
-            <div class="person-role-preview">Community Lead</div>
+            <div class="person-name">N&uacute;ria Alb&oacute; Canals</div>
+            <div class="person-role-preview">AI Engineer, Min. de Transportes y Movilidad</div>
           </div>
           <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo">MO</div>
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/alboNuria.png" onerror="this.remove();" alt="NA">NA</div>
             <div class="person-details">
-              <div class="person-role">Community Lead</div>
-              <div class="person-company">BrightPath Collective</div>
-              <div class="person-country">🇳🇬 Nigeria</div>
-              <div class="person-bio">Community strategist connecting grassroots movements with global tech events. Runs attendee engagement and networking sessions at FFT.</div>
+              <div class="person-role">AI Engineer, Project Manager</div>
+              <div class="person-company">Ministerio de Transportes y Movilidad Sostenible</div>
+              <div class="person-bio">Session: AI and Sustainable Mobility</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="person-card" data-search="lucas chen canada av technician soundstage pro">
+      <div class="person-card" data-search="natalia olsen catavalley eu innovation ecosystem">
         <div class="person-header" onclick="togglePerson(this)">
           <div class="person-header-left">
-            <div class="person-name">Lucas Chen</div>
-            <div class="person-role-preview">AV Technician</div>
+            <div class="person-name">Natalia Olsen</div>
+            <div class="person-role-preview">CataValley</div>
           </div>
           <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="person-body">
           <div class="person-body-inner">
-            <div class="person-photo">LC</div>
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/olsenNatalia.png" onerror="this.remove();" alt="NO">NO</div>
             <div class="person-details">
-              <div class="person-role">AV Technician</div>
-              <div class="person-company">SoundStage Pro</div>
-              <div class="person-country">🇨🇦 Canada</div>
-              <div class="person-bio">Audio-visual specialist handling all stage tech, streaming infrastructure, and live production for both days of the event.</div>
+              <div class="person-role">Speaker</div>
+              <div class="person-company">CataValley</div>
+              <div class="person-bio">Session: Building an EU-first innovation ecosystem</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="carolina angelini barcelona partners ceo eu innovation">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Carolina Angelini</div>
+            <div class="person-role-preview">CEO, Barcelona and Partners</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/angeliniCarolina.png" onerror="this.remove();" alt="CA">CA</div>
+            <div class="person-details">
+              <div class="person-role">CEO</div>
+              <div class="person-company">Barcelona and Partners</div>
+              <div class="person-bio">Session: Building an EU-first innovation ecosystem</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="luca cominassi metagov oecd ai law policy expert eu">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Luca Cominassi</div>
+            <div class="person-role-preview">AI Law &amp; Policy Expert, Metagov / OECD</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/cominassiLuca.png" onerror="this.remove();" alt="LC">LC</div>
+            <div class="person-details">
+              <div class="person-role">AI Law &amp; Policy Expert</div>
+              <div class="person-company">Metagov / OECD</div>
+              <div class="person-bio">Session: Building an EU-first innovation ecosystem</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="de kai hong kong university science technology professor computer science ai pioneer">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">De Kai</div>
+            <div class="person-role-preview">Professor of CS &amp; Engineering, HKUST</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/deKai.png" onerror="this.remove();" alt="DK">DK</div>
+            <div class="person-details">
+              <div class="person-role">Professor of Computer Science &amp; Engineering, AI Pioneer</div>
+              <div class="person-company">Hong Kong University of Science and Technology</div>
+              <div class="person-bio">Session: AI's Next Move. Author of "Raising AI".</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="robb miller fractional chief revenue officer selling ai saas">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Robb Miller</div>
+            <div class="person-role-preview">Chief Revenue Officer, Fractional</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/millerRobb.png" onerror="this.remove();" alt="RM">RM</div>
+            <div class="person-details">
+              <div class="person-role">Chief Revenue Officer</div>
+              <div class="person-company">Fractional</div>
+              <div class="person-bio">Session: Selling AI SaaS - from Software as a Service to Services as a Software</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="carlos grau grau innovation selling ai saas">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Carlos Grau</div>
+            <div class="person-role-preview">Grau Innovation</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/grauCarlos.png" onerror="this.remove();" alt="CG">CG</div>
+            <div class="person-details">
+              <div class="person-role">Speaker</div>
+              <div class="person-company">Grau Innovation</div>
+              <div class="person-bio">Session: Selling AI SaaS - from Software as a Service to Services as a Software</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="jen stein aerospace corporation senior foresight strategist sustainability space">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Jen Stein, PhD</div>
+            <div class="person-role-preview">Sr. Foresight Strategist, Aerospace Corp.</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/steinJen.png" onerror="this.remove();" alt="JS">JS</div>
+            <div class="person-details">
+              <div class="person-role">Senior Foresight Strategist (Project Engineer)</div>
+              <div class="person-company">The Aerospace Corporation</div>
+              <div class="person-bio">Session: How to shoot for the moon - and save the Earth</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="victor luo eth zurich director space technology partnerships sustainability">
+        <div class="person-header" onclick="togglePerson(this)">
+          <div class="person-header-left">
+            <div class="person-name">Victor Luo</div>
+            <div class="person-role-preview">Director, Space Tech &amp; Partnerships, ETH Z&uuml;rich</div>
+          </div>
+          <svg class="person-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="person-body">
+          <div class="person-body-inner">
+            <div class="person-photo"><img src="https://raw.githubusercontent.com/CollaboratorFuturity/FFT/main/imgs/luoVictor.png" onerror="this.remove();" alt="VL">VL</div>
+            <div class="person-details">
+              <div class="person-role">Director, Space Technology &amp; Partnerships</div>
+              <div class="person-company">ETH Z&uuml;rich</div>
+              <div class="person-bio">Session: How to shoot for the moon - and save the Earth</div>
             </div>
           </div>
         </div>
@@ -313,173 +450,136 @@
   <!-- ════════ SCHEDULE ════════ -->
   <div id="schedule" class="panel">
 
-    <div class="day-header">Day 1 &mdash; Thursday, Feb 26 <span>5 sessions</span></div>
+    <div class="day-header">Day 1 &mdash; Thursday, Feb 26 <span>8 sessions</span></div>
 
     <div class="sched-item">
-      <div class="sched-time">08:30</div>
-      <div class="sched-details">
-        <div class="sched-title">Registration & Welcome Coffee</div>
-        <div class="sched-meta">📍 Main Lobby &nbsp;·&nbsp; <strong>Jonas Eriksson</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">10:00</div>
+        <div class="sched-summary">
+          <div class="sched-title">Food fight? Collaboration for food startups &amp; corporates</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>Christine Gould</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-    </div>
-
-    <div class="sched-item">
-      <div class="sched-time">09:30</div>
-      <div class="sched-details">
-        <div class="sched-title">Opening Keynote: Building What's Next</div>
-        <div class="sched-meta">📍 Grand Hall A &nbsp;·&nbsp; <strong>Alex Rivera</strong></div>
-      </div>
-    </div>
-
-    <div class="sched-item">
-      <div class="sched-time">11:00</div>
-      <div class="sched-details">
-        <div class="sched-title">Workshop: Real-Time Systems at Scale</div>
-        <div class="sched-meta">📍 Workshop Room 1 &nbsp;·&nbsp; <strong>Priya Menon</strong></div>
-      </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">FAST</div>
+        <div class="sched-lead">Lead: <strong>Christine Gould</strong> (Thought for Food / GIGA)</div>
+        <div class="sched-desc">Corporate innovation goals often align with &mdash; and depend on &mdash; agile startups paving the way. But timelines, scope, and scale are often out of whack, especially in massive, complex industries like food and agriculture. Learn how companies, investors, startups, and governments can collaborate to take proven solutions and get them adopted &mdash; at speed and at system level.</div>
+      </div></div>
     </div>
 
     <div class="sched-item">
-      <div class="sched-time">14:00</div>
-      <div class="sched-details">
-        <div class="sched-title">Panel: Grassroots Meets Global</div>
-        <div class="sched-meta">📍 Grand Hall B &nbsp;·&nbsp; <strong>Maya Okafor</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">10:45</div>
+        <div class="sched-summary">
+          <div class="sched-title">Beyond regeneration: Designing future soil systems</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>Fran Antequera, Livia Kalossaka</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">FAST</div>
+        <div class="sched-lead">Leads: <strong>Fran Antequera</strong> (AgriTech Center) &amp; <strong>Livia Kalossaka</strong> (CDL)</div>
+        <div class="sched-desc">Regenerative agriculture set the direction, but what comes next? This session pushes beyond current frameworks to explore how we might actively design soil ecosystems for resilience, governance, and territorial stability &mdash; repositioning soil as living, programmable, and strategic infrastructure for a climate-constrained future.</div>
+      </div></div>
     </div>
 
     <div class="sched-item">
-      <div class="sched-time">16:30</div>
-      <div class="sched-details">
-        <div class="sched-title">Networking Social</div>
-        <div class="sched-meta">📍 Rooftop Terrace &nbsp;·&nbsp; <strong>Maya Okafor</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">12:00</div>
+        <div class="sched-summary">
+          <div class="sched-title">AI and Sustainable Mobility</div>
+          <div class="sched-meta">📍 Track B &ndash; Business &nbsp;·&nbsp; <strong>N&uacute;ria Alb&oacute; Canals</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-    </div>
-
-    <div style="height: 20px;"></div>
-
-    <div class="day-header">Day 2 &mdash; Friday, Feb 27 <span>5 sessions</span></div>
-
-    <div class="sched-item">
-      <div class="sched-time">09:00</div>
-      <div class="sched-details">
-        <div class="sched-title">Day 2 Kickoff & Recap</div>
-        <div class="sched-meta">📍 Grand Hall A &nbsp;·&nbsp; <strong>Alex Rivera</strong></div>
-      </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">FAST</div>
+        <div class="sched-lead">Lead: <strong>N&uacute;ria Alb&oacute; Canals</strong> (Min. de Transportes y Movilidad Sostenible)</div>
+        <div class="sched-desc">How will AI, autonomous vehicles, and quantum computing change urban and global logistics? AI engineer and data scientist N&uacute;ria Alb&oacute; will talk about the Spanish Ministry of Digital Transformation's AI initiatives in mobility and sustainability.</div>
+      </div></div>
     </div>
 
     <div class="sched-item">
-      <div class="sched-time">10:00</div>
-      <div class="sched-details">
-        <div class="sched-title">Deep Dive: Immersive AV Production</div>
-        <div class="sched-meta">📍 Workshop Room 2 &nbsp;·&nbsp; <strong>Lucas Chen</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">12:45</div>
+        <div class="sched-summary">
+          <div class="sched-title">Building an EU-first innovation ecosystem</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>Natalia Olsen, Carolina Angelini, Luca Cominassi</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">FAST</div>
+        <div class="sched-lead">Leads: <strong>Natalia Olsen</strong> (CataValley), <strong>Carolina Angelini</strong> (Barcelona &amp; Partners), <strong>Luca Cominassi</strong> (Metagov/OECD)</div>
+        <div class="sched-desc">Geopolitics are shifting faster, and in more unexpected ways, than even seasoned strategists expected. In this age of uncertainty, European states, cities, innovation clusters, investors, and startups are all rethinking their futures &mdash; and finding common cause together.</div>
+      </div></div>
     </div>
 
     <div class="sched-item">
-      <div class="sched-time">12:00</div>
-      <div class="sched-details">
-        <div class="sched-title">Lightning Talks: Community Innovations</div>
-        <div class="sched-meta">📍 Grand Hall B &nbsp;·&nbsp; <strong>Maya Okafor</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">14:30</div>
+        <div class="sched-summary">
+          <div class="sched-title">AI's Next Move</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>De Kai</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">FAST</div>
+        <div class="sched-lead">Lead: <strong>De Kai</strong> (HKUST)</div>
+        <div class="sched-desc">We think of AI as a superintelligence, but what if it's more like a child &mdash; that needs to be raised (by us!) to learn hygiene, manners, kindness alongside knowledge. Discuss with noted professor and AI developer De Kai, author of "Raising AI".</div>
+      </div></div>
     </div>
 
     <div class="sched-item">
-      <div class="sched-time">14:30</div>
-      <div class="sched-details">
-        <div class="sched-title">Workshop: Scaling Event Infrastructure</div>
-        <div class="sched-meta">📍 Workshop Room 1 &nbsp;·&nbsp; <strong>Priya Menon</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">15:15</div>
+        <div class="sched-summary">
+          <div class="sched-title">Selling AI SaaS &ndash; Software as a Service to Services as a Software</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>Robb Miller, Carlos Grau</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">Facilitator-Led</div>
+        <div class="sched-lead">Leads: <strong>Robb Miller</strong> (Fractional) &amp; <strong>Carlos Grau</strong> (Grau Innovation)</div>
+        <div class="sched-desc">AI adoption is a scramble, but it's quickly entering enterprise offerings, which will shift how it's sold. Robb Miller, a global SaaS sales thought leader, will talk about cross-border lessons on pipeline generation, consumption pricing, and trading margin for moat. In conversation with Carlos Grau, they will discuss "Service as a Software" &mdash; a new kind of SaaS disrupting professional services.</div>
+      </div></div>
     </div>
 
     <div class="sched-item">
-      <div class="sched-time">17:00</div>
-      <div class="sched-details">
-        <div class="sched-title">Closing Ceremony & Awards</div>
-        <div class="sched-meta">📍 Grand Hall A &nbsp;·&nbsp; <strong>Jonas Eriksson</strong></div>
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">16:30</div>
+        <div class="sched-summary">
+          <div class="sched-title">How to shoot for the moon &ndash; and save the Earth</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>Jen Stein, Victor Luo</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">Facilitator-Led</div>
+        <div class="sched-lead">Leads: <strong>Jen Stein, PhD</strong> (Aerospace Corp.) &amp; <strong>Victor Luo</strong> (ETH Z&uuml;rich)</div>
+        <div class="sched-desc">Building on her Stanford d.school class with the participation of the SETI Institute, Blue Origin, and Google X, Miki Sode will guide participants through how space innovation and systems thinking can unlock bold solutions here on the ground. From lunar missions to regenerative design &mdash; this talk is about aiming high, with both feet planted in planetary purpose.</div>
+      </div></div>
     </div>
 
-  </div>
-
-  <!-- ════════ SESSIONS ════════ -->
-  <div id="sessions" class="panel">
-    <input type="text" class="search-bar" placeholder="Search sessions..." id="sessions-search">
-
-    <div id="sessions-list">
-
-      <div class="session-card" data-search="opening keynote building what's next alex rivera grand hall a day 1">
-        <div class="session-tag">Keynote</div>
-        <div class="session-title">Opening Keynote: Building What's Next</div>
-        <div class="session-time">Day 1 &nbsp;·&nbsp; 09:30 &ndash; 10:45</div>
-        <div class="session-location">📍 Grand Hall A</div>
-        <div class="session-lead">Team Lead: <strong>Alex Rivera</strong></div>
-        <div class="session-desc">The opening keynote sets the tone for FFT 2026. Alex walks through the evolution of experiential technology, shares case studies from the past year, and unveils this year's theme: acceleration through collaboration. Expect live demos, audience interaction, and a surprise guest segment.</div>
+    <div class="sched-item">
+      <div class="sched-header" onclick="toggleSched(this)">
+        <div class="sched-time">17:15</div>
+        <div class="sched-summary">
+          <div class="sched-title">The dAIting game &ndash; humans vs AI in creative thinking</div>
+          <div class="sched-meta">📍 Track C &ndash; Planet &nbsp;·&nbsp; <strong>Futurity-led</strong></div>
+        </div>
+        <svg class="sched-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-
-      <div class="session-card" data-search="workshop real-time systems at scale priya menon workshop room 1 day 1">
-        <div class="session-tag">Workshop</div>
-        <div class="session-title">Real-Time Systems at Scale</div>
-        <div class="session-time">Day 1 &nbsp;·&nbsp; 11:00 &ndash; 12:30</div>
-        <div class="session-location">📍 Workshop Room 1</div>
-        <div class="session-lead">Team Lead: <strong>Priya Menon</strong></div>
-        <div class="session-desc">A hands-on workshop covering the architecture behind real-time event platforms. Topics include WebSocket optimization, edge caching strategies, and handling 10k+ concurrent connections. Attendees will build a mini live-polling system during the session.</div>
-      </div>
-
-      <div class="session-card" data-search="panel grassroots meets global maya okafor grand hall b day 1">
-        <div class="session-tag">Panel</div>
-        <div class="session-title">Grassroots Meets Global</div>
-        <div class="session-time">Day 1 &nbsp;·&nbsp; 14:00 &ndash; 15:30</div>
-        <div class="session-location">📍 Grand Hall B</div>
-        <div class="session-lead">Team Lead: <strong>Maya Okafor</strong></div>
-        <div class="session-desc">A panel featuring community organizers from five continents discussing how local innovation scales globally. Panelists share stories of grassroots tech movements that grew into international collaborations. Moderated Q&A follows.</div>
-      </div>
-
-      <div class="session-card" data-search="networking social rooftop terrace maya okafor day 1">
-        <div class="session-tag">Social</div>
-        <div class="session-title">Networking Social</div>
-        <div class="session-time">Day 1 &nbsp;·&nbsp; 16:30 &ndash; 18:30</div>
-        <div class="session-location">📍 Rooftop Terrace</div>
-        <div class="session-lead">Team Lead: <strong>Maya Okafor</strong></div>
-        <div class="session-desc">Casual networking with curated conversation tables, speed-meeting rounds, and drinks. A great chance to meet collaborators and continue conversations from the day's sessions.</div>
-      </div>
-
-      <div class="session-card" data-search="deep dive immersive av production lucas chen workshop room 2 day 2">
-        <div class="session-tag">Workshop</div>
-        <div class="session-title">Immersive AV Production</div>
-        <div class="session-time">Day 2 &nbsp;·&nbsp; 10:00 &ndash; 11:45</div>
-        <div class="session-location">📍 Workshop Room 2</div>
-        <div class="session-lead">Team Lead: <strong>Lucas Chen</strong></div>
-        <div class="session-desc">Behind-the-scenes look at the AV stack powering FFT. Lucas walks through multi-camera live switching, spatial audio setup, LED wall calibration, and live-streaming architecture. Attendees get hands-on time with the control booth.</div>
-      </div>
-
-      <div class="session-card" data-search="lightning talks community innovations maya okafor grand hall b day 2">
-        <div class="session-tag">Lightning Talks</div>
-        <div class="session-title">Community Innovations</div>
-        <div class="session-time">Day 2 &nbsp;·&nbsp; 12:00 &ndash; 13:00</div>
-        <div class="session-location">📍 Grand Hall B</div>
-        <div class="session-lead">Team Lead: <strong>Maya Okafor</strong></div>
-        <div class="session-desc">Eight 5-minute talks from community members showcasing projects born out of last year's FFT. Expect demos of open-source tools, creative campaigns, and local impact stories. Audience voting picks the top three.</div>
-      </div>
-
-      <div class="session-card" data-search="workshop scaling event infrastructure priya menon workshop room 1 day 2">
-        <div class="session-tag">Workshop</div>
-        <div class="session-title">Scaling Event Infrastructure</div>
-        <div class="session-time">Day 2 &nbsp;·&nbsp; 14:30 &ndash; 16:00</div>
-        <div class="session-location">📍 Workshop Room 1</div>
-        <div class="session-lead">Team Lead: <strong>Priya Menon</strong></div>
-        <div class="session-desc">From 100-person meetups to 5,000-seat conferences: a practical workshop on scaling event tech. Covers ticketing pipelines, badge printing automation, real-time analytics dashboards, and failover strategies for live events.</div>
-      </div>
-
-      <div class="session-card" data-search="closing ceremony awards jonas eriksson grand hall a day 2">
-        <div class="session-tag">Ceremony</div>
-        <div class="session-title">Closing Ceremony & Awards</div>
-        <div class="session-time">Day 2 &nbsp;·&nbsp; 17:00 &ndash; 18:30</div>
-        <div class="session-location">📍 Grand Hall A</div>
-        <div class="session-lead">Team Lead: <strong>Jonas Eriksson</strong></div>
-        <div class="session-desc">The official close of FFT 2026. Highlights reel from both days, community awards for standout contributions, and a look ahead at what's coming next. Followed by a farewell reception in the lobby.</div>
-      </div>
-
+      <div class="sched-body"><div class="sched-body-inner">
+        <div class="sched-tag">Futurity-led</div>
+        <div class="sched-lead">Lead: <strong>Futurity team</strong></div>
+        <div class="sched-desc">Long before we had Tinder, Bumble, and Grindr, there was The Dating Game on TV &mdash; and now AI partners are A Thing. How do today's eligible bachelorettes and bachelors measure up to Claude Aeye, Chad Geepete, and other AI paramours? Has Cupid met his match?</div>
+      </div></div>
     </div>
+
   </div>
 
 </div>
@@ -498,43 +598,37 @@
     });
   });
 
-  // ── People accordion (one open at a time) ──
-  function togglePerson(header) {
-    const card = header.closest('.person-card');
-    const body = card.querySelector('.person-body');
-    const isOpen = card.classList.contains('open');
+  // ── Generic accordion helper ──
+  function toggleAccordion(header, containerSelector) {
+    const item = header.closest(containerSelector);
+    const body = item.querySelector(containerSelector === '.person-card' ? '.person-body' : '.sched-body');
+    const isOpen = item.classList.contains('open');
 
-    // Close all
-    document.querySelectorAll('.person-card.open').forEach(c => {
+    // Close all of same type
+    document.querySelectorAll(containerSelector + '.open').forEach(c => {
       c.classList.remove('open');
-      c.querySelector('.person-body').style.maxHeight = '0';
+      const b = c.querySelector(containerSelector === '.person-card' ? '.person-body' : '.sched-body');
+      b.style.maxHeight = '0';
     });
 
     // Open clicked (if it wasn't already open)
     if (!isOpen) {
-      card.classList.add('open');
+      item.classList.add('open');
       body.style.maxHeight = body.scrollHeight + 'px';
     }
   }
 
+  function togglePerson(header) { toggleAccordion(header, '.person-card'); }
+  function toggleSched(header) { toggleAccordion(header, '.sched-item'); }
+
   // ── Search: People ──
   document.getElementById('people-search').addEventListener('input', function() {
     const q = this.value.toLowerCase();
-    // Close any open card when searching
     document.querySelectorAll('.person-card.open').forEach(c => {
       c.classList.remove('open');
       c.querySelector('.person-body').style.maxHeight = '0';
     });
     document.querySelectorAll('.person-card').forEach(card => {
-      const match = card.getAttribute('data-search').includes(q);
-      card.style.display = match ? '' : 'none';
-    });
-  });
-
-  // ── Search: Sessions ──
-  document.getElementById('sessions-search').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('.session-card').forEach(card => {
       const match = card.getAttribute('data-search').includes(q);
       card.style.display = match ? '' : 'none';
     });
