@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>FUTURE FASTER TODAY</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --accent: #00e0a0;
+    --accent-dim: rgba(0, 224, 160, 0.12);
+    --text: #f0f0f0;
+    --text-secondary: #999;
+    --border: #2a2a2a;
+    --tag-bg: #2a2a2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    padding: env(safe-area-inset-top, 12px) 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent); text-align: center; padding: 12px 0 8px;
+  }
+  .header-date {
+    font-size: 11px; color: var(--text-secondary); text-align: center; padding-bottom: 10px;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; gap: 0;
+  }
+  .tab {
+    flex: 1; text-align: center; padding: 10px 0 12px;
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Content ── */
+  .content {
+    padding: 120px 16px 32px;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Section titles ── */
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); margin: 24px 0 12px; padding-left: 2px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* ── People cards ── */
+  .person-card {
+    background: var(--surface); border-radius: 14px;
+    padding: 16px; margin-bottom: 12px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .person-photo {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--surface2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--accent); font-weight: 700;
+    overflow: hidden;
+  }
+  .person-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .person-info { flex: 1; min-width: 0; }
+  .person-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .person-role { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 2px; }
+  .person-company { font-size: 12px; color: var(--text-secondary); margin-bottom: 1px; }
+  .person-country { font-size: 11px; color: var(--text-secondary); }
+  .person-bio {
+    font-size: 12px; color: var(--text-secondary); line-height: 1.5;
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+  }
+
+  /* ── Schedule ── */
+  .day-header {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    padding: 14px 0 4px; margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .day-header span { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+
+  .sched-item {
+    display: flex; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .sched-time {
+    width: 58px; flex-shrink: 0;
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    padding-top: 1px;
+  }
+  .sched-details { flex: 1; }
+  .sched-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .sched-meta { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+  .sched-meta strong { color: var(--text); font-weight: 600; }
+
+  /* ── Session cards ── */
+  .session-card {
+    background: var(--surface); border-radius: 14px;
+    padding: 16px; margin-bottom: 12px;
+    border-left: 3px solid var(--accent);
+  }
+  .session-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    background: var(--accent-dim); color: var(--accent);
+    padding: 3px 8px; border-radius: 6px; margin-bottom: 8px;
+  }
+  .session-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .session-time { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+  .session-location { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .session-lead { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+  .session-lead strong { color: var(--text); }
+  .session-desc {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+
+  /* ── Search / filter ── */
+  .search-bar {
+    width: 100%; padding: 10px 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 14px; margin-bottom: 16px;
+    outline: none;
+  }
+  .search-bar::placeholder { color: var(--text-secondary); }
+  .search-bar:focus { border-color: var(--accent); }
+
+  /* ── Empty state ── */
+  .empty-note {
+    text-align: center; color: var(--text-secondary); font-size: 13px;
+    padding: 40px 20px; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">Future Faster Today</div>
+  <div class="header-date">Feb 26 &ndash; 27, 2026</div>
+  <div class="tabs">
+    <button class="tab active" data-panel="people">People</button>
+    <button class="tab" data-panel="schedule">Schedule</button>
+    <button class="tab" data-panel="sessions">Sessions</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ════════ PEOPLE ════════ -->
+  <div id="people" class="panel active">
+    <input type="text" class="search-bar" placeholder="Search people..." id="people-search">
+
+    <div id="people-list">
+
+      <div class="person-card" data-search="alex rivera united states creative director luminar studios">
+        <div class="person-photo">AR</div>
+        <div class="person-info">
+          <div class="person-name">Alex Rivera</div>
+          <div class="person-role">Creative Director</div>
+          <div class="person-company">Luminar Studios</div>
+          <div class="person-country">🇺🇸 United States</div>
+          <div class="person-bio">Award-winning creative director with 12 years of experience in immersive storytelling and experiential design. Leads the visual identity for FFT.</div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="priya menon india lead engineer nexaflow">
+        <div class="person-photo">PM</div>
+        <div class="person-info">
+          <div class="person-name">Priya Menon</div>
+          <div class="person-role">Lead Engineer</div>
+          <div class="person-company">NexaFlow</div>
+          <div class="person-country">🇮🇳 India</div>
+          <div class="person-bio">Full-stack engineer specializing in real-time systems and low-latency event tech. Architected the FFT scheduling platform.</div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="jonas eriksson sweden production manager nordic events co">
+        <div class="person-photo">JE</div>
+        <div class="person-info">
+          <div class="person-name">Jonas Eriksson</div>
+          <div class="person-role">Production Manager</div>
+          <div class="person-company">Nordic Events Co.</div>
+          <div class="person-country">🇸🇪 Sweden</div>
+          <div class="person-bio">Manages end-to-end production logistics. Has coordinated 50+ large-scale international events across Europe and the Americas.</div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="maya okafor nigeria community lead brightpath collective">
+        <div class="person-photo">MO</div>
+        <div class="person-info">
+          <div class="person-name">Maya Okafor</div>
+          <div class="person-role">Community Lead</div>
+          <div class="person-company">BrightPath Collective</div>
+          <div class="person-country">🇳🇬 Nigeria</div>
+          <div class="person-bio">Community strategist connecting grassroots movements with global tech events. Runs attendee engagement and networking sessions at FFT.</div>
+        </div>
+      </div>
+
+      <div class="person-card" data-search="lucas chen canada av technician soundstage pro">
+        <div class="person-photo">LC</div>
+        <div class="person-info">
+          <div class="person-name">Lucas Chen</div>
+          <div class="person-role">AV Technician</div>
+          <div class="person-company">SoundStage Pro</div>
+          <div class="person-country">🇨🇦 Canada</div>
+          <div class="person-bio">Audio-visual specialist handling all stage tech, streaming infrastructure, and live production for both days of the event.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════ SCHEDULE ════════ -->
+  <div id="schedule" class="panel">
+
+    <div class="day-header">Day 1 &mdash; Thursday, Feb 26 <span>5 sessions</span></div>
+
+    <div class="sched-item">
+      <div class="sched-time">08:30</div>
+      <div class="sched-details">
+        <div class="sched-title">Registration & Welcome Coffee</div>
+        <div class="sched-meta">📍 Main Lobby &nbsp;·&nbsp; <strong>Jonas Eriksson</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">09:30</div>
+      <div class="sched-details">
+        <div class="sched-title">Opening Keynote: Building What's Next</div>
+        <div class="sched-meta">📍 Grand Hall A &nbsp;·&nbsp; <strong>Alex Rivera</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">11:00</div>
+      <div class="sched-details">
+        <div class="sched-title">Workshop: Real-Time Systems at Scale</div>
+        <div class="sched-meta">📍 Workshop Room 1 &nbsp;·&nbsp; <strong>Priya Menon</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">14:00</div>
+      <div class="sched-details">
+        <div class="sched-title">Panel: Grassroots Meets Global</div>
+        <div class="sched-meta">📍 Grand Hall B &nbsp;·&nbsp; <strong>Maya Okafor</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">16:30</div>
+      <div class="sched-details">
+        <div class="sched-title">Networking Social</div>
+        <div class="sched-meta">📍 Rooftop Terrace &nbsp;·&nbsp; <strong>Maya Okafor</strong></div>
+      </div>
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <div class="day-header">Day 2 &mdash; Friday, Feb 27 <span>5 sessions</span></div>
+
+    <div class="sched-item">
+      <div class="sched-time">09:00</div>
+      <div class="sched-details">
+        <div class="sched-title">Day 2 Kickoff & Recap</div>
+        <div class="sched-meta">📍 Grand Hall A &nbsp;·&nbsp; <strong>Alex Rivera</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">10:00</div>
+      <div class="sched-details">
+        <div class="sched-title">Deep Dive: Immersive AV Production</div>
+        <div class="sched-meta">📍 Workshop Room 2 &nbsp;·&nbsp; <strong>Lucas Chen</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">12:00</div>
+      <div class="sched-details">
+        <div class="sched-title">Lightning Talks: Community Innovations</div>
+        <div class="sched-meta">📍 Grand Hall B &nbsp;·&nbsp; <strong>Maya Okafor</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">14:30</div>
+      <div class="sched-details">
+        <div class="sched-title">Workshop: Scaling Event Infrastructure</div>
+        <div class="sched-meta">📍 Workshop Room 1 &nbsp;·&nbsp; <strong>Priya Menon</strong></div>
+      </div>
+    </div>
+
+    <div class="sched-item">
+      <div class="sched-time">17:00</div>
+      <div class="sched-details">
+        <div class="sched-title">Closing Ceremony & Awards</div>
+        <div class="sched-meta">📍 Grand Hall A &nbsp;·&nbsp; <strong>Jonas Eriksson</strong></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════ SESSIONS ════════ -->
+  <div id="sessions" class="panel">
+    <input type="text" class="search-bar" placeholder="Search sessions..." id="sessions-search">
+
+    <div id="sessions-list">
+
+      <div class="session-card" data-search="opening keynote building what's next alex rivera grand hall a day 1">
+        <div class="session-tag">Keynote</div>
+        <div class="session-title">Opening Keynote: Building What's Next</div>
+        <div class="session-time">Day 1 &nbsp;·&nbsp; 09:30 &ndash; 10:45</div>
+        <div class="session-location">📍 Grand Hall A</div>
+        <div class="session-lead">Team Lead: <strong>Alex Rivera</strong></div>
+        <div class="session-desc">The opening keynote sets the tone for FFT 2026. Alex walks through the evolution of experiential technology, shares case studies from the past year, and unveils this year's theme: acceleration through collaboration. Expect live demos, audience interaction, and a surprise guest segment.</div>
+      </div>
+
+      <div class="session-card" data-search="workshop real-time systems at scale priya menon workshop room 1 day 1">
+        <div class="session-tag">Workshop</div>
+        <div class="session-title">Real-Time Systems at Scale</div>
+        <div class="session-time">Day 1 &nbsp;·&nbsp; 11:00 &ndash; 12:30</div>
+        <div class="session-location">📍 Workshop Room 1</div>
+        <div class="session-lead">Team Lead: <strong>Priya Menon</strong></div>
+        <div class="session-desc">A hands-on workshop covering the architecture behind real-time event platforms. Topics include WebSocket optimization, edge caching strategies, and handling 10k+ concurrent connections. Attendees will build a mini live-polling system during the session.</div>
+      </div>
+
+      <div class="session-card" data-search="panel grassroots meets global maya okafor grand hall b day 1">
+        <div class="session-tag">Panel</div>
+        <div class="session-title">Grassroots Meets Global</div>
+        <div class="session-time">Day 1 &nbsp;·&nbsp; 14:00 &ndash; 15:30</div>
+        <div class="session-location">📍 Grand Hall B</div>
+        <div class="session-lead">Team Lead: <strong>Maya Okafor</strong></div>
+        <div class="session-desc">A panel featuring community organizers from five continents discussing how local innovation scales globally. Panelists share stories of grassroots tech movements that grew into international collaborations. Moderated Q&A follows.</div>
+      </div>
+
+      <div class="session-card" data-search="networking social rooftop terrace maya okafor day 1">
+        <div class="session-tag">Social</div>
+        <div class="session-title">Networking Social</div>
+        <div class="session-time">Day 1 &nbsp;·&nbsp; 16:30 &ndash; 18:30</div>
+        <div class="session-location">📍 Rooftop Terrace</div>
+        <div class="session-lead">Team Lead: <strong>Maya Okafor</strong></div>
+        <div class="session-desc">Casual networking with curated conversation tables, speed-meeting rounds, and drinks. A great chance to meet collaborators and continue conversations from the day's sessions.</div>
+      </div>
+
+      <div class="session-card" data-search="deep dive immersive av production lucas chen workshop room 2 day 2">
+        <div class="session-tag">Workshop</div>
+        <div class="session-title">Immersive AV Production</div>
+        <div class="session-time">Day 2 &nbsp;·&nbsp; 10:00 &ndash; 11:45</div>
+        <div class="session-location">📍 Workshop Room 2</div>
+        <div class="session-lead">Team Lead: <strong>Lucas Chen</strong></div>
+        <div class="session-desc">Behind-the-scenes look at the AV stack powering FFT. Lucas walks through multi-camera live switching, spatial audio setup, LED wall calibration, and live-streaming architecture. Attendees get hands-on time with the control booth.</div>
+      </div>
+
+      <div class="session-card" data-search="lightning talks community innovations maya okafor grand hall b day 2">
+        <div class="session-tag">Lightning Talks</div>
+        <div class="session-title">Community Innovations</div>
+        <div class="session-time">Day 2 &nbsp;·&nbsp; 12:00 &ndash; 13:00</div>
+        <div class="session-location">📍 Grand Hall B</div>
+        <div class="session-lead">Team Lead: <strong>Maya Okafor</strong></div>
+        <div class="session-desc">Eight 5-minute talks from community members showcasing projects born out of last year's FFT. Expect demos of open-source tools, creative campaigns, and local impact stories. Audience voting picks the top three.</div>
+      </div>
+
+      <div class="session-card" data-search="workshop scaling event infrastructure priya menon workshop room 1 day 2">
+        <div class="session-tag">Workshop</div>
+        <div class="session-title">Scaling Event Infrastructure</div>
+        <div class="session-time">Day 2 &nbsp;·&nbsp; 14:30 &ndash; 16:00</div>
+        <div class="session-location">📍 Workshop Room 1</div>
+        <div class="session-lead">Team Lead: <strong>Priya Menon</strong></div>
+        <div class="session-desc">From 100-person meetups to 5,000-seat conferences: a practical workshop on scaling event tech. Covers ticketing pipelines, badge printing automation, real-time analytics dashboards, and failover strategies for live events.</div>
+      </div>
+
+      <div class="session-card" data-search="closing ceremony awards jonas eriksson grand hall a day 2">
+        <div class="session-tag">Ceremony</div>
+        <div class="session-title">Closing Ceremony & Awards</div>
+        <div class="session-time">Day 2 &nbsp;·&nbsp; 17:00 &ndash; 18:30</div>
+        <div class="session-location">📍 Grand Hall A</div>
+        <div class="session-lead">Team Lead: <strong>Jonas Eriksson</strong></div>
+        <div class="session-desc">The official close of FFT 2026. Highlights reel from both days, community awards for standout contributions, and a look ahead at what's coming next. Followed by a farewell reception in the lobby.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Tab switching ──
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.panel).classList.add('active');
+    });
+  });
+
+  // ── Search: People ──
+  document.getElementById('people-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.person-card').forEach(card => {
+      const match = card.getAttribute('data-search').includes(q);
+      card.style.display = match ? '' : 'none';
+    });
+  });
+
+  // ── Search: Sessions ──
+  document.getElementById('sessions-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.session-card').forEach(card => {
+      const match = card.getAttribute('data-search').includes(q);
+      card.style.display = match ? '' : 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
