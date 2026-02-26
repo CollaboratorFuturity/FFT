@@ -159,6 +159,25 @@
     border-bottom: 1px solid var(--border);
     overflow: hidden;
   }
+  .sched-break {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    opacity: 0.5;
+  }
+  .sched-break .sched-time {
+    min-width: 48px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .sched-break .break-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
   .sched-header {
     display: flex; gap: 12px; padding: 12px 0;
     cursor: pointer; -webkit-user-select: none; user-select: none;
@@ -524,6 +543,11 @@
       </div></div>
     </div>
 
+    <div class="sched-break">
+      <div class="sched-time">11:30</div>
+      <div class="break-label">☕ Break</div>
+    </div>
+
     <div class="sched-item">
       <div class="sched-header" onclick="toggleSched(this)">
         <div class="sched-time">12:00</div>
@@ -556,6 +580,11 @@
       </div></div>
     </div>
 
+    <div class="sched-break">
+      <div class="sched-time">13:30</div>
+      <div class="break-label">🍽 Lunch</div>
+    </div>
+
     <div class="sched-item">
       <div class="sched-header" onclick="toggleSched(this)">
         <div class="sched-time">14:30</div>
@@ -586,6 +615,11 @@
         <div class="sched-lead">Leads: <a class="person-link" onclick="goToPerson('robb miller',event)">Robb Miller</a> (Fractional) &amp; <a class="person-link" onclick="goToPerson('carlos grau',event)">Carlos Grau</a> (Grau Innovation)</div>
         <div class="sched-desc">AI adoption is a scramble, but it's quickly entering enterprise offerings, which will shift how it's sold. Robb Miller, a global SaaS sales thought leader, will talk about cross-border lessons on pipeline generation, consumption pricing, and trading margin for moat. In conversation with Carlos Grau, they will discuss "Service as a Software" &mdash; a new kind of SaaS disrupting professional services.</div>
       </div></div>
+    </div>
+
+    <div class="sched-break">
+      <div class="sched-time">16:00</div>
+      <div class="break-label">☕ Break</div>
     </div>
 
     <div class="sched-item">
