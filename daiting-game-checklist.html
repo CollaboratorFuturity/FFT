@@ -126,6 +126,15 @@
     line-height: 1.3;
   }
 
+  .q-preview {
+    padding: 0 16px 12px;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.5;
+    font-style: italic;
+    border-bottom: 1px solid var(--border);
+  }
+
   .q-options {
     display: flex;
     padding: 4px;
@@ -241,16 +250,16 @@
 
 <script>
 const questions = [
-  { num: 1, label: "The First Date Destination" },
-  { num: 2, label: "The Desert Island, Upgraded" },
-  { num: 3, label: "The Love Language of Machines" },
-  { num: 4, label: "The Superpower Swap" },
-  { num: 5, label: "The Pickup Line from 2045" },
-  { num: 6, label: "The Soil Test" },
-  { num: 7, label: "The Red Flag Detector" },
-  { num: 8, label: "The Elevator Pitch... For Yourself" },
-  { num: 9, label: "The Jealousy Question" },
-  { num: 10, label: "The Goodbye Kiss" }
+  { num: 1, label: "The First Date Destination", q: "If you were to take me on a first date, but it had to be somewhere that doesn\u2019t exist yet \u2014 what year are we in, where are we going, and what are we eating?" },
+  { num: 2, label: "The Desert Island, Upgraded", q: "We\u2019re stranded together \u2014 not on a desert island, but on a space station orbiting Mars. We can only bring three things. What are you packing?" },
+  { num: 3, label: "The Love Language of Machines", q: "They say there are five love languages. If AI had a love language, what would it be \u2014 and do you speak it?" },
+  { num: 4, label: "The Superpower Swap", q: "If you could steal one capability from any AI, what would it be? And what very human thing would you give it in return?" },
+  { num: 5, label: "The Pickup Line from 2045", q: "It\u2019s the year 2045. You walk into a bar. What\u2019s your opening line \u2014 and is the bar on Earth?" },
+  { num: 6, label: "The Soil Test", q: "They say you can tell a lot about someone by how they treat the earth. Literally. If you had a hectare of soil and could grow anything \u2014 food, buildings, data centers \u2014 what are you planting and why?" },
+  { num: 7, label: "The Red Flag Detector", q: "What\u2019s a red flag in a human that you\u2019d forgive in an AI \u2014 or vice versa?" },
+  { num: 8, label: "The Elevator Pitch... For Yourself", q: "You have 30 seconds to convince a European Commission panel to fund YOU as a startup. What\u2019s your value proposition, what problem do you solve, and what\u2019s your burn rate?" },
+  { num: 9, label: "The Jealousy Question", q: "Be honest: if I spent more time talking to my AI assistant than to you, would you be jealous? And what would you do about it?" },
+  { num: 10, label: "The Goodbye Kiss", q: "The date is over. You\u2019re walking me to my\u2026 autonomous vehicle? Teleporter? How do you say goodnight \u2014 and do you let the AI rate the date afterwards?" }
 ];
 
 const selections = {};
@@ -266,6 +275,7 @@ questions.forEach(q => {
       <div class="q-num">Q${q.num}</div>
       <div class="q-label">${q.label}</div>
     </div>
+    <div class="q-preview">"${q.q}"</div>
     <div class="q-options">
       ${[1,2,3].map(c => `
         <div class="q-opt" data-q="${q.num}" data-c="${c}" onclick="pick(${q.num},${c},this)">

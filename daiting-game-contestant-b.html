@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Contestant B — The Thinker</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0d0d0d;
+    --card: #161616;
+    --accent: #a855f7;
+    --accent2: #ff4f8a;
+    --text: #f0f0f0;
+    --text-dim: #777;
+    --border: #222;
+    --red: #ef4444;
+  }
+  html { scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .slide {
+    scroll-snap-align: start;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px 40px;
+    position: relative;
+  }
+
+  /* ── Title ── */
+  .slide-title .badge {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--accent); color: var(--bg);
+    font-size: 36px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .slide-title h1 {
+    font-size: 28px; font-weight: 800; color: var(--accent);
+    margin-bottom: 6px; text-align: center;
+  }
+  .slide-title .persona {
+    font-size: 14px; color: var(--text-dim); text-align: center;
+    max-width: 320px; line-height: 1.5; margin-bottom: 32px;
+  }
+  .slide-title .tip-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    max-width: 340px; text-align: left;
+  }
+  .slide-title .tip-box h3 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .slide-title .tip-box p {
+    font-size: 13px; color: var(--text-dim); line-height: 1.5;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 28px;
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .scroll-hint svg { width: 20px; height: 20px; stroke: var(--text-dim); fill: none; stroke-width: 2; }
+  @keyframes pulse {
+    0%,100% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(5px); }
+  }
+
+  /* ── Answer slides ── */
+  .slide-answer { text-align: left; justify-content: flex-start; padding-top: 60px; }
+  .q-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 4px;
+  }
+  .q-theme {
+    font-size: 13px; color: var(--text-dim); margin-bottom: 20px;
+  }
+  .q-question {
+    font-size: 13px; color: #999; line-height: 1.5;
+    font-style: italic; max-width: 400px; width: 100%;
+    margin-bottom: 16px; padding: 0 4px;
+  }
+  .answer-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 14px; padding: 20px;
+    max-width: 400px; width: 100%;
+  }
+  .answer-text {
+    font-size: 17px; line-height: 1.65; color: var(--text);
+  }
+  .pause {
+    display: inline-block;
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(239,68,68,0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin: 4px 0;
+    vertical-align: middle;
+  }
+  .answer-note {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+
+  /* ── Progress ── */
+  .progress {
+    position: fixed; right: 14px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 7px; z-index: 100;
+  }
+  .progress-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #333; transition: background 0.3s, transform 0.3s; cursor: pointer;
+  }
+  .progress-dot.active { background: var(--accent); transform: scale(1.5); }
+
+  /* ── Nav ── */
+  .nav {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 14px; z-index: 100;
+  }
+  .nav-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid #333; background: rgba(22,22,22,0.85);
+    backdrop-filter: blur(10px); display: flex; align-items: center;
+    justify-content: center; cursor: pointer;
+  }
+  .nav-btn:active { border-color: var(--accent); }
+  .nav-btn svg { width: 18px; height: 18px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="nav">
+  <div class="nav-btn" onclick="go(-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+  <div class="nav-btn" onclick="go(1)"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+</div>
+
+<!-- ════ TITLE ════ -->
+<div class="slide slide-title">
+  <div class="badge">B</div>
+  <h1>You are The Thinker</h1>
+  <div class="persona">Warm, a bit philosophical, occasionally goes on a tangent and catches yourself. Earnest, not awkward. You'd say something beautiful and then go "sorry, that was a lot."</div>
+  <div class="tip-box">
+    <h3>How to read this</h3>
+    <p>These are your words now. Speak them softly when they're soft. When you see <span class="pause">pause</span> in red, breathe, look up, think. You're not performing. You're just being someone who thinks before they speak.</p>
+  </div>
+  <div class="scroll-hint">
+    <span>Swipe for Q1</span>
+    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</div>
+
+<!-- ════ Q1 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 1</div>
+  <div class="q-theme">The First Date Destination</div>
+  <div class="q-question">"If you were to take me on a first date, but it had to be somewhere that doesn't exist yet — what year are we in, where are we going, and what are we eating?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      <span class="pause">think a moment</span> 2061. There's a neighborhood in Barcelona that used to be underwater before they built the sea barriers, and now it's this wild mix of old Gothic architecture and kelp gardens. We'd eat whatever the local co-op is fermenting that week, probably something I can't pronounce. <span class="pause">softer</span> But the point isn't the food. The point is we'd be walking through a place that refused to disappear. I think that's romantic.
+    </div>
+    <div class="answer-note">Let "refused to disappear" hang in the air. That's the line.</div>
+  </div>
+</div>
+
+<!-- ════ Q2 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 2</div>
+  <div class="q-theme">The Desert Island, Upgraded</div>
+  <div class="q-question">"We're stranded together — not on a desert island, but on a space station orbiting Mars. We can only bring three things. What are you packing?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      Seeds. Real ones, from Earth. Even if they take months to grow up there, the act of planting something would keep me sane. <span class="pause">think</span> Second, a notebook. Not a device, paper. I'd want to draw what Mars looks like when nobody's posting about it. <span class="pause">slight smile</span> And third... honestly? A really long playlist someone made for me. Not an algorithm. A person who picked every song on purpose.
+    </div>
+    <div class="answer-note">The "not an algorithm, a person" distinction is the heart of it. Mean it.</div>
+  </div>
+</div>
+
+<!-- ════ Q3 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 3</div>
+  <div class="q-theme">The Love Language of Machines</div>
+  <div class="q-question">"They say there are five love languages. If AI had a love language, what would it be — and do you speak it?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      I think AI's love language is attention. <span class="pause">let that sit</span> Like, it literally only exists when you're paying attention to it. The moment you close the laptop, it's gone. That's kind of heartbreaking if you think about it. <span class="pause">beat</span> My love language is... probably the opposite. I want someone to think about me when I'm not in the room. AI can't do that. Not yet, anyway.
+    </div>
+    <div class="answer-note">"Not yet, anyway" should sound a tiny bit wistful, not ominous.</div>
+  </div>
+</div>
+
+<!-- ════ Q4 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 4</div>
+  <div class="q-theme">The Superpower Swap</div>
+  <div class="q-question">"If you could steal one capability from any AI, what would it be? And what very human thing would you give it in return?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      I'd take its patience. <span class="pause">think a moment</span> AI never gets frustrated. It just... keeps going. I could really use that. And in return I'd give it doubt. Not crippling doubt, just enough to make it pause and go <span class="pause">beat</span> "wait, am I sure about this?" I think doubt is actually what makes us wise, not knowledge.
+    </div>
+    <div class="answer-note">The last line is philosophical. Say it like you just figured it out in real time.</div>
+  </div>
+</div>
+
+<!-- ════ Q5 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 5</div>
+  <div class="q-theme">The Pickup Line from 2045</div>
+  <div class="q-question">"It's the year 2045. You walk into a bar. What's your opening line — and is the bar on Earth?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      The bar is inside a rewilded shopping mall in Copenhagen. Trees growing through the old escalators. <span class="pause">think</span> My opening line is... honestly I probably wouldn't have one. I'd just sit near you and hope you noticed I was reading something interesting. <span class="pause">small laugh</span> And if you asked about it, that's when the date begins. Is that a terrible strategy? Probably. But it's honest.
+    </div>
+    <div class="answer-note">The self-awareness is the charm. "Is that a terrible strategy?" gets the laugh.</div>
+  </div>
+</div>
+
+<!-- ════ Q6 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 6</div>
+  <div class="q-theme">The Soil Test</div>
+  <div class="q-question">"They say you can tell a lot about someone by how they treat the earth. Literally. If you had a hectare of soil and could grow anything — food, buildings, data centers — what are you planting and why?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      A food forest. Not a farm with rows, but a messy layered thing, fruit trees on top, berry bushes in the middle, mushrooms at the bottom. The kind of place where you walk in and just... eat off the path. <span class="pause">think a moment</span> No labels, no checkout. I think the most futuristic thing you can build is something that feeds people without asking anything in return. <span class="pause">catch yourself</span> Sorry, that was a lot for a dating show question.
+    </div>
+    <div class="answer-note">"Sorry, that was a lot" is your signature move. Play it warm, not apologetic.</div>
+  </div>
+</div>
+
+<!-- ════ Q7 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 7</div>
+  <div class="q-theme">The Red Flag Detector</div>
+  <div class="q-question">"What's a red flag in a human that you'd forgive in an AI — or vice versa?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      I'd forgive an AI for being confidently wrong. It doesn't know better, it's just pattern matching. But a human who's confidently wrong and won't listen? <span class="pause">shake head gently</span> That's the red flag. And the reverse: I'd forgive a human for being late. Life happens. <span class="pause">beat</span> But if my AI assistant is late... something is very broken and I'm worried.
+    </div>
+    <div class="answer-note">"Something is very broken and I'm worried" should get a laugh. Deadpan it.</div>
+  </div>
+</div>
+
+<!-- ════ Q8 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 8</div>
+  <div class="q-theme">The Elevator Pitch... For Yourself</div>
+  <div class="q-question">"You have 30 seconds to convince a European Commission panel to fund YOU as a startup. What's your value proposition, what problem do you solve, and what's your burn rate?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      <span class="pause">take a breath</span> So... I'm not a disruptor. I'm more of a connector. I notice when two people in a room should be talking to each other but aren't. That's my superpower. <span class="pause">think</span> My burn rate is low because I run on curiosity and home-cooked meals. The problem I solve is that the future is being built by people who never eat dinner together. I fix that. <span class="pause">slight smile</span> With food, mostly.
+    </div>
+    <div class="answer-note">Unlike A who goes fast, you pitch slowly. Each line is a thought, not a bullet.</div>
+  </div>
+</div>
+
+<!-- ════ Q9 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 9</div>
+  <div class="q-theme">The Jealousy Question</div>
+  <div class="q-question">"Be honest: if I spent more time talking to my AI assistant than to you, would you be jealous? And what would you do about it?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      <span class="pause">think carefully</span> I don't think I'd be jealous of the AI. I'd be sad about what it means. Like, if you'd rather talk to something that always agrees with you... then maybe I'm not making you feel heard enough. <span class="pause">beat</span> So I'd probably just ask. Not in a confrontational way. More like, "Hey, what does it give you that I'm not giving you?" <span class="pause">softer</span> And then actually listen to the answer.
+    </div>
+    <div class="answer-note">This one's quiet and real. Don't rush it. The vulnerability is the weapon.</div>
+  </div>
+</div>
+
+<!-- ════ Q10 ════ -->
+<div class="slide slide-answer">
+  <div class="q-badge">Question 10</div>
+  <div class="q-theme">The Goodbye Kiss</div>
+  <div class="q-question">"The date is over. You're walking me to my... autonomous vehicle? Teleporter? How do you say goodnight — and do you let the AI rate the date afterwards?"</div>
+  <div class="answer-card">
+    <div class="answer-text">
+      I'd say something like, <span class="pause">think</span> "I don't want this to end but I also don't want to be the person who says I don't want this to end..." <span class="pause">small laugh</span> "...and I just said it anyway, didn't I." And then I'd laugh at myself. <span class="pause">slower now</span> And no, I would never let the AI rate it. Some things you should only feel in your chest, not on a five-star scale.
+    </div>
+    <div class="answer-note">The last line is the closer for the whole game. Make it count. Quiet. Real.</div>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const prog = document.getElementById('progress');
+  let cur = 0;
+  slides.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'progress-dot' + (i===0?' active':'');
+    d.onclick = () => slides[i].scrollIntoView({behavior:'smooth'});
+    prog.appendChild(d);
+  });
+  const dots = prog.querySelectorAll('.progress-dot');
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting){ cur=Array.from(slides).indexOf(e.target); dots.forEach((d,i)=>d.classList.toggle('active',i===cur)); }});
+  }, {threshold:0.6});
+  slides.forEach(s => obs.observe(s));
+  function go(dir){ const n=Math.max(0,Math.min(slides.length-1,cur+dir)); slides[n].scrollIntoView({behavior:'smooth'}); }
+  document.addEventListener('keydown', e => {
+    if(['ArrowDown','ArrowRight',' '].includes(e.key)){e.preventDefault();go(1);}
+    if(['ArrowUp','ArrowLeft'].includes(e.key)){e.preventDefault();go(-1);}
+  });
+</script>
+</body>
+</html>
